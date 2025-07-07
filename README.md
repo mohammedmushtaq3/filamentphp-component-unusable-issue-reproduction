@@ -1,61 +1,108 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FilamentPHP ToggleButtons Component Issue Reproduction
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🎥 Issue Demonstration
 
-## About Laravel
+<video controls src="issue_screen_recording.mov" title="ToggleButtons Component Issue Demo"></video>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Issue Summary
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This repository reproduces a bug in FilamentPHP where the `ToggleButtons` component becomes unusable when using a custom theme during development mode. Additionally, the production build process generates CSS syntax errors related to modern CSS features.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**GitHub Issue:** [#16844](https://github.com/filamentphp/filament/issues/16844)
 
-## Learning Laravel
+## 🐛 Problem Description
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Development Mode Issues
+- The `ToggleButtons` component appears unusable in the browser
+- Users are unable to select/click the toggle buttons
+- Component becomes non-interactive when custom theme is applied
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Production Build Issues
+- CSS syntax errors during Vite build process
+- Warnings about unexpected ")" characters
+- Issues with `:where()` pseudo-selectors and `color-mix()` functions
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🛠️ Technical Environment
 
-## Laravel Sponsors
+- **Package:** `filament/filament`
+- **Package Version:** `4.x-dev`
+- **Laravel Version:** `v12.0`
+- **Livewire Version:** `v3.6`
+- **PHP Version:** `PHP 8.3.22`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🔧 Reproduction Steps
 
-### Premium Partners
+### 1. Setup Custom Theme
+Follow the FilamentPHP documentation to set up a custom theme CSS file.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2. Implement ToggleButtons Component
+```php
+ToggleButtons::make('is_active')
+    ->label('Active')
+    ->boolean()
+    ->inline()
+    ->required()
+```
 
-## Contributing
+### 3. Development Mode Testing
+1. Run development server: `npm run dev`
+2. Open the admin panel and visit vendor edit page
+3. Observe the ToggleButtons component behavior
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Production Build Testing
+1. Run production build: `npm run build`
+2. Check for CSS syntax errors in the build output
 
-## Code of Conduct
+## 📊 Expected vs Actual Behavior
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Expected Behavior
+- ToggleButtons component should work correctly in both development and production modes
+- Component should be interactive and functional regardless of custom theme usage
 
-## Security Vulnerabilities
+### Actual Behavior
+- Component is unusable in development mode with custom theme
+- Production build generates CSS syntax warnings
+- Component appears non-interactive in browser
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🚨 Build Warnings
 
-## License
+When running `npm run build`, the following warnings appear:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+▲ [WARNING] Unexpected ")" [css-syntax-error]
+    <stdin>:2:279171:
+      2 │ ...table .selectedCell:after:where(){background-color:var(--gray-80...
+        ╵                                    ^
+
+▲ [WARNING] Unexpected ")" [css-syntax-error]
+    <stdin>:2:279311:
+      2 │ ...table .selectedCell:after:where(){background-color:color-mix(in ...
+        ╵                                    ^
+```
+
+## 📁 Repository Structure
+
+This repository contains:
+- Laravel application with FilamentPHP admin panel
+- Custom theme configuration
+- Vendor resource with ToggleButtons component
+- Screen recording demonstrating the issue
+
+## 🔍 Files of Interest
+
+- `app/Filament/Resources/Vendors/Schemas/VendorForm.php` - Contains the problematic ToggleButtons component
+- `resources/css/filament/admin/theme.css` - Custom theme configuration
+- `issue_screen_recording.mov` - Visual demonstration of the issue
+
+## 🎯 Impact
+
+This issue affects:
+- Development workflow when using custom themes
+- Production deployments due to CSS build warnings
+- Development experience with ToggleButtons component functionality
+
+## 📝 Notes
+
+- Issue occurs specifically with custom themes
+- Default FilamentPHP theme works correctly
+- Problem manifests in both development
