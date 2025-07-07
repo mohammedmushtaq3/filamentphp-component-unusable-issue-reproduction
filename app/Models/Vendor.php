@@ -8,7 +8,8 @@ class Vendor extends Model
 {
     protected $fillable = [
         'name',
-        'is_active'
+        'is_active',
+        'status'
     ];
 
     protected function casts(): array

@@ -19,6 +19,13 @@ class VendorForm
                     ->label('Active')
                     ->boolean()
                     ->required(),
+                ToggleButtons::make('status')
+                    ->options([
+                        1 => 'Draft',
+                        2 => 'Published',
+                        3 => 'Archieved'
+                    ])
+                    ->required()
             ]);
     }
 }
